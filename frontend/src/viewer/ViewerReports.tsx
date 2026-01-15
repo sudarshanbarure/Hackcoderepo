@@ -3,11 +3,11 @@ import {
   Paper,
   Typography,
   Box,
-  Grid,
   alpha,
   Avatar,
   IconButton,
 } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 import {
   DownloadOutlined as DownloadIcon,
   VisibilityOutlined as ViewIcon,
@@ -36,7 +36,7 @@ export default function ViewerReports() {
 
       <Grid container spacing={3}>
         {reports.map((report, idx) => (
-          <Grid size={{ xs: 12, md: 4 }} item key={report.id}>
+          <Grid key={report.id} size={{ xs: 12, md: 4 }}>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -55,9 +55,15 @@ export default function ViewerReports() {
                 }}
               >
                 <Box display="flex" alignItems="center" gap={2}>
-                  <Avatar sx={{ bgcolor: alpha("#6366F1", 0.1), color: "#6366F1" }}>
+                  <Avatar
+                    sx={{
+                      bgcolor: alpha("#6366F1", 0.1),
+                      color: "#6366F1",
+                    }}
+                  >
                     <DownloadIcon />
                   </Avatar>
+
                   <Box>
                     <Typography variant="body1" fontWeight={700}>
                       {report.name}
@@ -67,6 +73,7 @@ export default function ViewerReports() {
                     </Typography>
                   </Box>
                 </Box>
+
                 <IconButton color="primary" size="small">
                   <ViewIcon />
                 </IconButton>
