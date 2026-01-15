@@ -9,24 +9,9 @@ import {
   Paper,
   TextField,
   Typography,
-  Alert,
   Chip,
-  IconButton,
-  InputAdornment,
-  Tooltip,
+  Grid,
 } from "@mui/material";
-import Grid from "@mui/material/Grid2";
-import {
-  Visibility,
-  VisibilityOff,
-  Person,
-  Email,
-  Badge,
-  CalendarMonth,
-  Update,
-  Lock,
-} from "@mui/icons-material";
-import { motion } from "framer-motion";
 import Layout from "../components/Layout";
 import apiClient from "../api/apiClient";
 
@@ -68,11 +53,7 @@ export default function Profile() {
   });
 
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const effectiveUserId = userId ?? id;
 
@@ -92,14 +73,12 @@ export default function Profile() {
           data?.userId ??
           data?.user_id ??
           data?.userID ??
-          data?.user_id_pk ??
           0
       ),
       username:
         data?.username ??
         data?.userName ??
         data?.user_name ??
-        data?.login ??
         "",
       firstName: data?.firstName ?? data?.first_name ?? "",
       lastName: data?.lastName ?? data?.last_name ?? "",
@@ -181,7 +160,7 @@ export default function Profile() {
     <Layout>
       <Paper sx={{ p: 4, borderRadius: 4 }}>
         <Grid container spacing={4}>
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid item xs={12} md={4}>
             <Box textAlign="center">
               <Avatar sx={{ width: 96, height: 96, mb: 2 }}>
                 {initials || profile.username?.[0] || "U"}
@@ -193,9 +172,9 @@ export default function Profile() {
             </Box>
           </Grid>
 
-          <Grid size={{ xs: 12, md: 8 }}>
+          <Grid item xs={12} md={8}>
             <Grid container spacing={2}>
-              <Grid size={{ xs: 12, sm: 6 }}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
                   label="First name"
@@ -203,7 +182,7 @@ export default function Profile() {
                 />
               </Grid>
 
-              <Grid size={{ xs: 12, sm: 6 }}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
                   label="Last name"
@@ -211,15 +190,15 @@ export default function Profile() {
                 />
               </Grid>
 
-              <Grid size={{ xs: 12 }}>
+              <Grid item xs={12}>
                 <TextField fullWidth label="Email" value={form.email} />
               </Grid>
 
-              <Grid size={{ xs: 12 }}>
+              <Grid item xs={12}>
                 <Divider />
               </Grid>
 
-              <Grid size={{ xs: 12 }}>
+              <Grid item xs={12}>
                 <Box display="flex" justifyContent="flex-end" gap={2}>
                   <Button variant="contained">Save changes</Button>
                 </Box>
@@ -228,6 +207,12 @@ export default function Profile() {
           </Grid>
         </Grid>
       </Paper>
+
+      {error && (
+        <Typography color="error" mt={2}>
+          {error}
+        </Typography>
+      )}
     </Layout>
   );
 }
