@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
-import { Paper, Typography, Divider, Box, CircularProgress, Grid, Chip } from "@mui/material";
+import {
+  Paper,
+  Typography,
+  Divider,
+  Box,
+  CircularProgress,
+  Chip,
+} from "@mui/material";
+import Grid from "@mui/material/Grid2";
 import {
   LineChart,
   Line,
@@ -48,7 +56,7 @@ export default function SystemHealth() {
 
   useEffect(() => {
     loadStats();
-    const interval = setInterval(loadStats, 30000); // refresh every 30s
+    const interval = setInterval(loadStats, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -65,7 +73,7 @@ export default function SystemHealth() {
       </Typography>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Paper sx={{ p: 3, height: "100%" }}>
             <Typography variant="h6" mb={2}>
               Active Users by Role (Live)
@@ -90,9 +98,18 @@ export default function SystemHealth() {
                     </Typography>
                     <Box display="flex" flexWrap="wrap" gap={1.5} mt={1}>
                       <Chip label={`Admin: ${roleCounts.ADMIN}`} color="error" />
-                      <Chip label={`Manager: ${roleCounts.MANAGER}`} color="warning" />
-                      <Chip label={`Reviewer: ${roleCounts.REVIEWER}`} color="info" />
-                      <Chip label={`Viewer: ${roleCounts.VIEWER}`} color="success" />
+                      <Chip
+                        label={`Manager: ${roleCounts.MANAGER}`}
+                        color="warning"
+                      />
+                      <Chip
+                        label={`Reviewer: ${roleCounts.REVIEWER}`}
+                        color="info"
+                      />
+                      <Chip
+                        label={`Viewer: ${roleCounts.VIEWER}`}
+                        color="success"
+                      />
                     </Box>
                   </Box>
                 )}
@@ -101,7 +118,7 @@ export default function SystemHealth() {
           </Paper>
         </Grid>
 
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" mb={2}>
               System Load Over Time (%)
