@@ -8,7 +8,7 @@ import {
   CircularProgress,
   Chip,
 } from "@mui/material";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import {
   LineChart,
   Line,
@@ -31,35 +31,28 @@ export default function SystemHealth() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadStats = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await usersApi.getRoleStats();
-      const counts = res.data?.data || {};
-      setRoleCounts({
-        ADMIN: Number(counts.ADMIN ?? 0),
-        MANAGER: Number(counts.MANAGER ?? 0),
-        REVIEWER: Number(counts.REVIEWER ?? 0),
-        VIEWER: Number(counts.VIEWER ?? 0),
-      });
-    } catch (err: any) {
-      setError(
-        err?.response?.data?.message ||
-          "Failed to load system health metrics."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const res = await usersApi.getRoleStats();
+        const c = res.data?.data || {};
+        setRoleCounts({
+          ADMIN: Number(c.ADMIN ?? 0),
+          MANAGER: Number(c.MANAGER ?? 0),
+          REVIEWER: Number(c.REVIEWER ?? 0),
+          VIEWER: Number(c.VIEWER ?? 0),
+        });
+      } catch {
+        setError("Failed to load system metrics");
+      } finally {
+        setLoading(false);
+      }
+    };
+
     loadStats();
-    const interval = setInterval(loadStats, 30000);
-    return () => clearInterval(interval);
   }, []);
 
-  const totalUsers =
+  const total =
     (roleCounts?.ADMIN ?? 0) +
     (roleCounts?.MANAGER ?? 0) +
     (roleCounts?.REVIEWER ?? 0) +
@@ -72,66 +65,44 @@ export default function SystemHealth() {
       </Typography>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 3, height: "100%" }}>
-            <Typography variant="h6" mb={2}>
-              Active Users by Role
-            </Typography>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Paper sx={{ p: 3 }}>
+            <Typography variant="h6">Users by Role</Typography>
 
             {loading ? (
-              <Box display="flex" justifyContent="center" py={6}>
+              <Box display="flex" justifyContent="center" py={4}>
                 <CircularProgress />
               </Box>
             ) : (
               <>
-                {error && (
-                  <Typography color="error" mb={2}>
-                    {error}
-                  </Typography>
-                )}
-
+                {error && <Typography color="error">{error}</Typography>}
                 {roleCounts && (
-                  <>
-                    <Typography variant="body2" mb={1}>
-                      Total users: <b>{totalUsers}</b>
-                    </Typography>
-                    <Box display="flex" flexWrap="wrap" gap={1}>
-                      <Chip label={`Admin: ${roleCounts.ADMIN}`} color="error" />
-                      <Chip label={`Manager: ${roleCounts.MANAGER}`} color="warning" />
-                      <Chip label={`Reviewer: ${roleCounts.REVIEWER}`} color="info" />
-                      <Chip label={`Viewer: ${roleCounts.VIEWER}`} color="success" />
-                    </Box>
-                  </>
+                  <Box mt={2} display="flex" gap={1} flexWrap="wrap">
+                    <Chip label={`Admin ${roleCounts.ADMIN}`} color="error" />
+                    <Chip label={`Manager ${roleCounts.MANAGER}`} color="warning" />
+                    <Chip label={`Reviewer ${roleCounts.REVIEWER}`} color="info" />
+                    <Chip label={`Viewer ${roleCounts.VIEWER}`} color="success" />
+                  </Box>
                 )}
               </>
             )}
           </Paper>
         </Grid>
 
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" mb={2}>
-              System Load (%)
-            </Typography>
+            <Typography variant="h6">System Load</Typography>
 
-            <ResponsiveContainer width="100%" height={260}>
-              <LineChart
-                data={[
-                  { time: "Now", load: Math.min(100, totalUsers * 2 || 10) },
-                ]}
-              >
-                <XAxis dataKey="time" />
+            <ResponsiveContainer width="100%" height={250}>
+              <LineChart data={[{ t: "now", v: total || 10 }]}>
+                <XAxis dataKey="t" />
                 <YAxis />
                 <Tooltip />
-                <Line type="monotone" dataKey="load" stroke="#22C55E" />
+                <Line dataKey="v" />
               </LineChart>
             </ResponsiveContainer>
 
-            <Divider sx={{ my: 2 }} />
-
-            <Typography variant="body2" color="text.secondary">
-              Metrics refresh automatically every 30 seconds.
-            </Typography>
+            <Divider sx={{ mt: 2 }} />
           </Paper>
         </Grid>
       </Grid>
