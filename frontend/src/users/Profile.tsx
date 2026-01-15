@@ -9,9 +9,10 @@ import {
   Paper,
   TextField,
   Typography,
+  Alert,
   Chip,
-  Grid,
 } from "@mui/material";
+import Grid from "@mui/material/Grid";
 import Layout from "../components/Layout";
 import apiClient from "../api/apiClient";
 
@@ -27,16 +28,6 @@ type UserProfile = {
   lastName: string;
   email: string;
   role: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
-type FormState = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
 };
 
 export default function Profile() {
@@ -44,93 +35,35 @@ export default function Profile() {
   const navigate = useNavigate();
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [form, setForm] = useState<FormState>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const effectiveUserId = userId ?? id;
 
-  const buildProfileFromResponse = (raw: any): UserProfile => {
-    const data = raw?.data ?? raw?.user ?? raw;
-
-    const resolvedRole =
-      data?.role?.name ??
-      data?.role?.code ??
-      data?.role ??
-      (Array.isArray(data?.roles) ? data.roles[0]?.name : "") ??
-      "";
-
-    return {
-      id: Number(
-        data?.id ??
-          data?.userId ??
-          data?.user_id ??
-          data?.userID ??
-          0
-      ),
-      username:
-        data?.username ??
-        data?.userName ??
-        data?.user_name ??
-        "",
-      firstName: data?.firstName ?? data?.first_name ?? "",
-      lastName: data?.lastName ?? data?.last_name ?? "",
-      email: data?.email ?? "",
-      role: resolvedRole,
-      createdAt: data?.createdAt ?? data?.created_at ?? "",
-      updatedAt: data?.updatedAt ?? data?.updated_at ?? "",
-    };
-  };
-
-  const loadProfile = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        navigate("/login", { replace: true });
-        return;
-      }
-
-      const response = effectiveUserId
-        ? await apiClient.get(`/users/${effectiveUserId}`)
-        : await apiClient.get("/users/me");
-
-      const userProfile = buildProfileFromResponse(response.data);
-      setProfile(userProfile);
-      setForm({
-        firstName: userProfile.firstName,
-        lastName: userProfile.lastName,
-        email: userProfile.email,
-        password: "",
-        confirmPassword: "",
-      });
-    } catch (err: any) {
-      if (err?.response?.status === 401 || err?.response?.status === 403) {
-        navigate("/login", { replace: true });
-        return;
-      }
-      setError(
-        err?.response?.data?.message ||
-          err?.message ||
-          "Failed to load profile"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const res = effectiveUserId
+          ? await apiClient.get(`/users/${effectiveUserId}`)
+          : await apiClient.get("/users/me");
+
+        const u = res.data?.data || res.data;
+        setProfile({
+          id: u.id,
+          username: u.username,
+          firstName: u.firstName,
+          lastName: u.lastName,
+          email: u.email,
+          role: u.role?.name || u.role,
+        });
+      } catch {
+        setError("Failed to load profile");
+      } finally {
+        setLoading(false);
+      }
+    };
+
     loadProfile();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [effectiveUserId]);
 
   if (loading) {
@@ -146,60 +79,45 @@ export default function Profile() {
   if (!profile) {
     return (
       <Layout>
-        <Typography variant="h6" textAlign="center">
-          Unable to load profile
-        </Typography>
+        <Typography textAlign="center">Profile not found</Typography>
       </Layout>
     );
   }
 
-  const initials =
-    (profile.firstName?.[0] || "") + (profile.lastName?.[0] || "");
-
   return (
     <Layout>
-      <Paper sx={{ p: 4, borderRadius: 4 }}>
+      {error && <Alert severity="error">{error}</Alert>}
+
+      <Paper sx={{ p: 4, borderRadius: 3 }}>
         <Grid container spacing={4}>
           <Grid item xs={12} md={4}>
             <Box textAlign="center">
-              <Avatar sx={{ width: 96, height: 96, mb: 2 }}>
-                {initials || profile.username?.[0] || "U"}
+              <Avatar sx={{ width: 96, height: 96, mx: "auto", mb: 2 }}>
+                {profile.firstName[0]}
               </Avatar>
               <Typography variant="h6">
                 {profile.firstName} {profile.lastName}
               </Typography>
-              <Chip label={profile.role || "N/A"} size="small" sx={{ mt: 1 }} />
+              <Chip label={profile.role} sx={{ mt: 1 }} />
             </Box>
           </Grid>
 
           <Grid item xs={12} md={8}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="First name"
-                  value={form.firstName}
-                />
+                <TextField fullWidth label="First name" value={profile.firstName} />
               </Grid>
-
               <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Last name"
-                  value={form.lastName}
-                />
+                <TextField fullWidth label="Last name" value={profile.lastName} />
               </Grid>
-
               <Grid item xs={12}>
-                <TextField fullWidth label="Email" value={form.email} />
+                <TextField fullWidth label="Email" value={profile.email} />
               </Grid>
-
               <Grid item xs={12}>
                 <Divider />
               </Grid>
-
               <Grid item xs={12}>
-                <Box display="flex" justifyContent="flex-end" gap={2}>
+                <Box display="flex" justifyContent="flex-end">
                   <Button variant="contained">Save changes</Button>
                 </Box>
               </Grid>
@@ -207,12 +125,6 @@ export default function Profile() {
           </Grid>
         </Grid>
       </Paper>
-
-      {error && (
-        <Typography color="error" mt={2}>
-          {error}
-        </Typography>
-      )}
     </Layout>
   );
 }
