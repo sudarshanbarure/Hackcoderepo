@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  backend:
+    build:
+      context: ./ieodp-enterprise-backend-java
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      # Example DB config
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/ieodp
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=password
+    depends_on:
+      - mysql
+
+  python-service:
+    build:
+      context: ./Python-Service
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: ./ieodp-enterprise-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: ieodp
+    ports:
+      - "3306:3306"
