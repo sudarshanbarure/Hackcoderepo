@@ -1,6 +1,6 @@
 import Layout from "../components/Layout";
 import { Paper, Typography, Box, Avatar, IconButton } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import { DownloadOutlined, VisibilityOutlined } from "@mui/icons-material";
 
 const reports = [
