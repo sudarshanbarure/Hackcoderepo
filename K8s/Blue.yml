@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cityzen-blue
+  labels:
+    app: cityzen
+    version: blue
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: cityzen
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: cityzen
+        version: blue
+    spec:
+      containers:
+        - name: cityzen
+          image: REPLACE_BLUE_IMAGE
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cityzen-blue-service
+spec:
+  type: NodePort
+  selector:
+    app: cityzen
+    version: blue
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30081   # Dedicated port for BLUE

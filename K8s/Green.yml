@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cityzen-green
+  labels:
+    app: cityzen
+    version: green
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: cityzen
+      version: green
+  template:
+    metadata:
+      labels:
+        app: cityzen
+        version: green
+    spec:
+      containers:
+        - name: cityzen
+          image: REPLACE_GREEN_IMAGE
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cityzen-green-service
+spec:
+  type: NodePort
+  selector:
+    app: cityzen
+    version: green
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30082   # Dedicated port for GREEN
