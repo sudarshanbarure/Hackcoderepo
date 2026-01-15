@@ -7,8 +7,8 @@ import {
   Box,
   CircularProgress,
   Chip,
-  Grid,
 } from "@mui/material";
+import Grid from "@mui/material/Grid";
 import {
   LineChart,
   Line,
@@ -32,9 +32,9 @@ export default function SystemHealth() {
   const [error, setError] = useState<string | null>(null);
 
   const loadStats = async () => {
-    setLoading(true);
-    setError(null);
     try {
+      setLoading(true);
+      setError(null);
       const res = await usersApi.getRoleStats();
       const counts = res.data?.data || {};
       setRoleCounts({
@@ -44,10 +44,9 @@ export default function SystemHealth() {
         VIEWER: Number(counts.VIEWER ?? 0),
       });
     } catch (err: any) {
-      console.error("Failed to load user role stats for system health", err);
       setError(
         err?.response?.data?.message ||
-          "Failed to load system health metrics. Please try again."
+          "Failed to load system health metrics."
       );
     } finally {
       setLoading(false);
@@ -76,7 +75,7 @@ export default function SystemHealth() {
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3, height: "100%" }}>
             <Typography variant="h6" mb={2}>
-              Active Users by Role (Live)
+              Active Users by Role
             </Typography>
 
             {loading ? (
@@ -86,32 +85,23 @@ export default function SystemHealth() {
             ) : (
               <>
                 {error && (
-                  <Typography color="error" variant="body2" mb={2}>
+                  <Typography color="error" mb={2}>
                     {error}
                   </Typography>
                 )}
 
                 {roleCounts && (
-                  <Box display="flex" flexDirection="column" gap={1}>
-                    <Typography variant="body2" color="text.secondary">
+                  <>
+                    <Typography variant="body2" mb={1}>
                       Total users: <b>{totalUsers}</b>
                     </Typography>
-                    <Box display="flex" flexWrap="wrap" gap={1.5} mt={1}>
+                    <Box display="flex" flexWrap="wrap" gap={1}>
                       <Chip label={`Admin: ${roleCounts.ADMIN}`} color="error" />
-                      <Chip
-                        label={`Manager: ${roleCounts.MANAGER}`}
-                        color="warning"
-                      />
-                      <Chip
-                        label={`Reviewer: ${roleCounts.REVIEWER}`}
-                        color="info"
-                      />
-                      <Chip
-                        label={`Viewer: ${roleCounts.VIEWER}`}
-                        color="success"
-                      />
+                      <Chip label={`Manager: ${roleCounts.MANAGER}`} color="warning" />
+                      <Chip label={`Reviewer: ${roleCounts.REVIEWER}`} color="info" />
+                      <Chip label={`Viewer: ${roleCounts.VIEWER}`} color="success" />
                     </Box>
-                  </Box>
+                  </>
                 )}
               </>
             )}
@@ -121,7 +111,7 @@ export default function SystemHealth() {
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" mb={2}>
-              System Load Over Time (%)
+              System Load (%)
             </Typography>
 
             <ResponsiveContainer width="100%" height={260}>
@@ -137,13 +127,10 @@ export default function SystemHealth() {
               </LineChart>
             </ResponsiveContainer>
 
-            <Divider sx={{ my: 3 }} />
+            <Divider sx={{ my: 2 }} />
 
-            <Typography variant="subtitle1">System Status</Typography>
             <Typography variant="body2" color="text.secondary">
-              User metrics are updated in near real time. Role distribution and
-              total user count provide an at-a-glance view of platform usage and
-              access governance.
+              Metrics refresh automatically every 30 seconds.
             </Typography>
           </Paper>
         </Grid>
