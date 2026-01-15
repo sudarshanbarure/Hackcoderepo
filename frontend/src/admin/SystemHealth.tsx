@@ -7,8 +7,8 @@ import {
   Box,
   CircularProgress,
   Chip,
+  Grid,
 } from "@mui/material";
-import Grid from "@mui/material/Grid2";
 import {
   LineChart,
   Line,
@@ -73,7 +73,7 @@ export default function SystemHealth() {
       </Typography>
 
       <Grid container spacing={3}>
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3, height: "100%" }}>
             <Typography variant="h6" mb={2}>
               Active Users by Role (Live)
@@ -118,7 +118,7 @@ export default function SystemHealth() {
           </Paper>
         </Grid>
 
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" mb={2}>
               System Load Over Time (%)
